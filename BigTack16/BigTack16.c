@@ -82,6 +82,10 @@ void onKeyPress(u16 key)
 	USART_Transmit(n);
 	if(mode==COMMAND_SELECT)
 	{
+		if(key==2)
+		{
+			ForwardCommand(3);
+		}
 		currentCommand=n;
 	}
 	

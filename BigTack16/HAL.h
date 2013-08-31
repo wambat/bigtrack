@@ -45,6 +45,15 @@
 #define KEYBOARD_PIN_5 PINA5
 #define KEYBOARD_PIN_6 PINA6
 #define KEYBOARD_PIN_7 PINA7
+//MOTORS
+#define MOTOR_PORT PORTB
+#define MOTOR_PORT_DDR DDRB
+
+#define MOTOR_PIN_0 PINB0
+#define MOTOR_PIN_1 PINB1
+#define MOTOR_PIN_2 PINB2
+#define MOTOR_PIN_3 PINB3
+
 
 extern void InitAll(void);
 

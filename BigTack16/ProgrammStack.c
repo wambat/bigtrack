@@ -5,6 +5,7 @@
  *  Author: wambat
  */ 
 #include "ProgrammStack.h"
+#include "EERTOS.h"
 volatile static struct
 {
 	PPTR Command; 						// Указатель перехода
@@ -96,12 +97,16 @@ inline BOOL RunNextCommand(void)
 //Пустая процедура - простой ядра.
 void  IdleCommand(u08 param)
 {
-
+	
 }
 
 void ForwardCommand(u08 param)
 {
-	
+	MOTOR_PORT_DDR=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
+	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
+	MOTOR_PORT=1<<MOTOR_PIN_0|1<<MOTOR_PIN_2;
+	LED_PORT  |=1<<LED3;
+	SetTimerTask(StopMotors,param*100);
 }
 
 void BackwardCommand(u08 param)
@@ -117,4 +122,12 @@ void LeftCommand(u08 param)
 void RightCommand(u08 param)
 {
 	
+}
+
+void StopMotors(void)
+{
+	LED_PORT  &=~(1<<LED3);
+	MOTOR_PORT=0<<MOTOR_PIN_0|0<<MOTOR_PIN_1|0<<MOTOR_PIN_2|0<<MOTOR_PIN_3;
+	MOTOR_PORT_DDR=0<<MOTOR_PIN_1|0<<MOTOR_PIN_2|0<<MOTOR_PIN_3|0<<MOTOR_PIN_0;
+	MOTOR_PORT=0<<MOTOR_PIN_1|0<<MOTOR_PIN_2|0<<MOTOR_PIN_3|0<<MOTOR_PIN_0;
 }

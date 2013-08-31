@@ -20,6 +20,8 @@ extern void ForwardCommand(u08);
 extern void BackwardCommand(u08);
 extern void LeftCommand(u08);
 extern void RightCommand(u08);
+extern void StopMotors();
+
 extern void InitProgramStack(void);
 extern BOOL AddCommand(PPTR, u08);
 extern BOOL RunNextCommand(void);

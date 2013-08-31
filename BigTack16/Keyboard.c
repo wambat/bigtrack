@@ -24,7 +24,7 @@ void InitKeyboard()
 u16 QueryKeyboard()
 {
 	u08 read;
-	LED_PORT  ^=1<<LED3;
+	
 	u08 currentGround;
 	
 	u16 ret=0;
