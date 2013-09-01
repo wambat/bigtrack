@@ -15,7 +15,7 @@ const int Tune2[] PROGMEM=
 	16,a3,
 	32,c3,
 	64,f3,
-	4,a4,
+	64,a4,
 0};
 
 

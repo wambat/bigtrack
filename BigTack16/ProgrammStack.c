@@ -171,21 +171,28 @@ void PlaySoundCommand(u08 param)
 }
 void FireCommand(u08 param)
 {
+	fireCount=param;
 	isExecutingCommand=1;
+	//SetTimerTask(PlayFireSound,param*100);
+	playNextFire();
+}
+void playNextFire(void)
+{
+	fireCount--;
 	LED_PORT|=1<<FIRE_LED;
-	SetTimerTask(PlayFireSound,param*100);
+	PlayFireSound();
 }
 void PlayFireSound(void)
 {
-	char str[15];
-	sprintf(str,"Firing: %d\n",FIRE_SOUND);
-	USART_send(str);
-	playTune(FIRE_SOUND,StopFire);
+	playTune(FIRE_SOUND,StopFire);//StopFire
 }
 void StopFire(void)
 {
 	LED_PORT&=~(1<<FIRE_LED);
-	isExecutingCommand=0;
+	if(fireCount>0)
+		SetTimerTask(playNextFire,20);
+	else
+		isExecutingCommand=0;
 }
 void onSoundPlayed(void)
 {
