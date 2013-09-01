@@ -6,6 +6,7 @@
  */ 
 #include "ProgrammStack.h"
 #include "EERTOS.h"
+#include "soundsys/sound.h"
 volatile static struct
 {
 	PPTR Command; 						// ”казатель перехода
@@ -40,6 +41,8 @@ inline void InitProgramStack(void)
 	ProgramKeyCodes[2].KeyCode=6;
 	ProgramKeyCodes[3].Command=LeftCommand;
 	ProgramKeyCodes[3].KeyCode=4;
+	ProgramKeyCodes[4].Command=PlaySoundCommand;
+	ProgramKeyCodes[4].KeyCode=10;
 }
 PPTR CommandFromCode(u08 key)
 {
@@ -156,4 +159,13 @@ void StopMotors(void)
 	MOTOR_PORT_DDR=0<<MOTOR_PIN_1|0<<MOTOR_PIN_2|0<<MOTOR_PIN_3|0<<MOTOR_PIN_0;
 	MOTOR_PORT=0<<MOTOR_PIN_1|0<<MOTOR_PIN_2|0<<MOTOR_PIN_3|0<<MOTOR_PIN_0;
 	isExecutingCommand=0;
+}
+void PlaySoundCommand(u08 param)
+{
+	isExecutingCommand=1;
+	playTune(param);
+}
+void onSoundPlayed()
+{
+	isExecutingCommand=0;	
 }

@@ -15,7 +15,7 @@
 void InitSoundTick(void);
 void stopSound(void);
 void playNote(u08);
-void playTune(const int*);
+void playTune(u08);
 void playNextNote(void);
-
+extern void onSoundPlayed(void);
 #endif /* SOUND_H_ */

@@ -149,6 +149,9 @@
     <Compile Include="soundsys\notes.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="soundsys\ReadyTune.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="soundsys\sine.h">
       <SubType>compile</SubType>
     </Compile>
@@ -156,6 +159,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="soundsys\sound.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="soundsys\Sounds.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="soundsys\Sounds.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="Usart.c">

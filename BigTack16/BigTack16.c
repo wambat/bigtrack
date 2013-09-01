@@ -135,7 +135,7 @@ int main(void)
 	InitProgramStack();
 	InitKeyboard();
 	InitSoundTick();
-	playTune(NULL);
+	playTune(0);
 	//initBT();			// init BT
 	// Запуск фоновых задач.
 	SetTask(TryExecuteNextCommand);

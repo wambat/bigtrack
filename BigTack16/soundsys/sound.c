@@ -9,12 +9,14 @@
 #include "sound.h"
 #include "sine.h"
 #include "notes.h"
-#include "imperial.h"
+#include "Sounds.h"
 #include "../HAL.h"
 #include "../EERTOS.h"
+#define FACT 8
 u16 cnt;
 
 const int *pSong;
+
 /*
 
 Function To Initialize TIMER0 In Fast
@@ -39,15 +41,21 @@ ISR(SOUND_ISR)
 void stopSound(void)
 {
 	TIMSK&=~(1<<OCIE0);
+	onSoundPlayed();
+}
+void pause(u16 duration)
+{
+	TIMSK&=~(1<<OCIE0);
+	SetTimerTask(playNextNote,(64/duration)*FACT);
 }
 void playNote(u08 note)
 {
 	TIMSK|=1<<OCIE0;
 	OCR0=note;
 }
-void playTune(const int *ps)
+void playTune(u08 num)
 {
-	pSong=Imperial;//(int*)pgm_read_word(&Songs[WHICHSONG]);
+	pSong=(int*)pgm_read_word(&Sounds[num]);
     cnt = 0;
 	playNextNote();
 }
@@ -62,7 +70,10 @@ void playNextNote(void)
 		return;
 	}
 	note=(u16)pgm_read_word(pSong + cnt + 1);
-	playNote((u08)(note));
+	if(note==p)
+		pause(duration);
+	else
+		playNote((u08)(note));
 	cnt+=2;
-	SetTimerTask(playNextNote,(64/duration)*8);
+	SetTimerTask(playNextNote,(64/duration)*FACT);
 }

@@ -12,18 +12,22 @@ const int Imperial[] PROGMEM=
 6,f3, 64,p,
 16,c4, 64,p,
 2,a3, 64,p,
+8,p,
+4, e4, 64, p,
+4, e4, 64, p,
+4, e4, 64, p,
+6, f4, 64, p,
+16, c4, 64, p,
+4, cx3, 64, p,
+6, f3, 64, p,
+16, c4, 64, p,
+2, a3, 64, p,
 0};
 
 #endif
 /*
 8,cx3,
 
-
-
-beep(speakerPin, a, 500);
-beep(speakerPin, f, 350);
-beep(speakerPin, cH, 150);
-beep(speakerPin, a, 1000);
 
 beep(speakerPin, eH, 500);
 beep(speakerPin, eH, 500);
