@@ -6,6 +6,7 @@
  */ 
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+#include "avr/io.h"
 #include "sound.h"
 #include "sine.h"
 #include "notes.h"
@@ -16,7 +17,7 @@
 u16 cnt;
 
 const int *pSong;
-
+TPTR callStop;
 /*
 
 Function To Initialize TIMER0 In Fast
@@ -41,7 +42,9 @@ ISR(SOUND_ISR)
 void stopSound(void)
 {
 	TIMSK&=~(1<<OCIE0);
-	onSoundPlayed();
+	if(callStop)
+		(callStop)();
+	callStop=0;
 }
 void pause(u16 duration)
 {
@@ -53,10 +56,11 @@ void playNote(u08 note)
 	TIMSK|=1<<OCIE0;
 	OCR0=note;
 }
-void playTune(u08 num)
+void playTune(u08 num, TPTR call)
 {
 	pSong=(int*)pgm_read_word(&Sounds[num]);
     cnt = 0;
+	callStop=call;
 	playNextNote();
 }
 void playNextNote(void)

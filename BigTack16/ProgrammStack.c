@@ -7,6 +7,7 @@
 #include "ProgrammStack.h"
 #include "EERTOS.h"
 #include "soundsys/sound.h"
+#include "soundsys/Sounds.h"
 volatile static struct
 {
 	PPTR Command; 						// ”казатель перехода
@@ -19,6 +20,7 @@ volatile static struct
 	u08 KeyCode;							// param
 } ProgramKeyCodes[ProgramKeyCodeSize+1];
 volatile BOOL isExecutingCommand;
+volatile u08 fireCount;
 inline void InitProgramStack(void)
 {
 	isExecutingCommand=0;
@@ -42,7 +44,9 @@ inline void InitProgramStack(void)
 	ProgramKeyCodes[3].Command=LeftCommand;
 	ProgramKeyCodes[3].KeyCode=4;
 	ProgramKeyCodes[4].Command=PlaySoundCommand;
-	ProgramKeyCodes[4].KeyCode=10;
+	ProgramKeyCodes[4].KeyCode=1;
+	ProgramKeyCodes[5].Command=FireCommand;
+	ProgramKeyCodes[5].KeyCode=3;
 }
 PPTR CommandFromCode(u08 key)
 {
@@ -163,9 +167,28 @@ void StopMotors(void)
 void PlaySoundCommand(u08 param)
 {
 	isExecutingCommand=1;
-	playTune(param);
+	playTune(param,onSoundPlayed);
 }
-void onSoundPlayed()
+void FireCommand(u08 param)
 {
+	isExecutingCommand=1;
+	LED_PORT|=1<<FIRE_LED;
+	SetTimerTask(PlayFireSound,param*100);
+}
+void PlayFireSound(void)
+{
+	char str[15];
+	sprintf(str,"Firing: %d\n",FIRE_SOUND);
+	USART_send(str);
+	playTune(FIRE_SOUND,StopFire);
+}
+void StopFire(void)
+{
+	LED_PORT&=~(1<<FIRE_LED);
+	isExecutingCommand=0;
+}
+void onSoundPlayed(void)
+{
+	
 	isExecutingCommand=0;	
 }

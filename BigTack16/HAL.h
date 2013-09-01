@@ -24,12 +24,10 @@
 
 
 //PORT Defines
-#define LED1 		4
-#define LED2		5
-#define	LED3		7
+#define FIRE_LED		5
+#define	KEYBOARD_LED    6
+#define	SERVICE_LED		7
 
-#define I_C			3
-#define I_L			6
 #define LED_PORT 	PORTD
 #define LED_DDR		DDRD
 //KEYBOARD

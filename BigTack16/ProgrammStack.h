@@ -21,7 +21,11 @@ extern void BackwardCommand(u08);
 extern void LeftCommand(u08);
 extern void RightCommand(u08);
 extern void PlaySoundCommand(u08);
-extern void StopMotors();
+extern void FireCommand(u08);
+extern void StopMotors(void);
+extern void PlayFireSound(void);
+extern void StopFire(void);
+
 
 extern void InitProgramStack(void);
 extern BOOL AddCommand(PPTR, u08);

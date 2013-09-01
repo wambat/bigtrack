@@ -10,12 +10,13 @@
 #define SOUND_H_
 #include "../avrlibdefs.h"
 #include "../avrlibtypes.h"
+#include "../EERTOS.h"
 
 
 void InitSoundTick(void);
 void stopSound(void);
 void playNote(u08);
-void playTune(u08);
+void playTune(u08, TPTR);
 void playNextNote(void);
 extern void onSoundPlayed(void);
 #endif /* SOUND_H_ */

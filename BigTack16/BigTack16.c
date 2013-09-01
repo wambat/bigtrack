@@ -27,11 +27,11 @@ ISR(USART_RXC_vect)
 	switch(lastUsart)
 	{
 		case '1' : 
-			LED_PORT|= 1<<LED3; 
+			LED_PORT|= 1<<SERVICE_LED; 
 			USART_Transmit('1');
 			break;
 		case '0' : 
-			LED_PORT&= ~(1<<LED3); 
+			LED_PORT&= ~(1<<SERVICE_LED); 
 			USART_Transmit('0');
 			break;
 		default: 
@@ -99,7 +99,7 @@ void onKeyPress(u16 key)
 		toParamMode();
 		return;
 	}
-	if(mode==PARAM_SELECT)
+	if(mode==PARAM_SELECT && n<10)
 	{
 		USART_send("PRM\n");
 		currentParam=n;
@@ -110,17 +110,17 @@ void onKeyPress(u16 key)
 }
 void toCommandSelectMode(void)
 {
-	LED_PORT  &=~(1<<LED3);
+	LED_PORT  &=~(1<<KEYBOARD_LED);
 	mode=COMMAND_SELECT;
 }
 void toParamMode(void)
 {
-	LED_PORT  |=1<<LED3;
+	LED_PORT  |=1<<KEYBOARD_LED;
 	mode=PARAM_SELECT;
 }
 void toExecuteMode(void)
 {
-	LED_PORT  |=1<<LED3;
+	LED_PORT  |=1<<KEYBOARD_LED;
 	mode=EXECUTING;
 }
 
@@ -135,7 +135,7 @@ int main(void)
 	InitProgramStack();
 	InitKeyboard();
 	InitSoundTick();
-	playTune(0);
+	playTune(0,NULL);
 	//initBT();			// init BT
 	// Запуск фоновых задач.
 	SetTask(TryExecuteNextCommand);
