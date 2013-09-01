@@ -1,0 +1,21 @@
+/*
+ * sound.h
+ *
+ * Created: 01.09.2013 11:57:56
+ *  Author: wambat
+ */ 
+
+
+#ifndef SOUND_H_
+#define SOUND_H_
+#include "../avrlibdefs.h"
+#include "../avrlibtypes.h"
+
+
+void InitSoundTick(void);
+void stopSound(void);
+void playNote(u08);
+void playTune(const int*);
+void playNextNote(void);
+
+#endif /* SOUND_H_ */

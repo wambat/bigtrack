@@ -47,4 +47,11 @@ unsigned char USART_Receive( void )
 	/* Get and return received data from buffer */
 	return UDR;
 }
-
+void USART_send(char *data)
+{
+	while(*data)
+	{
+		USART_Transmit(*data);
+		data++;
+	}
+}

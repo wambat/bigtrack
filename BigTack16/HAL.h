@@ -36,7 +36,6 @@
 #define KEYBOARD_PORT PORTA
 #define KEYBOARD_PORT_IN PINA
 #define KEYBOARD_DDR DDRA
-
 #define KEYBOARD_PIN_0 PINA0
 #define KEYBOARD_PIN_1 PINA1
 #define KEYBOARD_PIN_2 PINA2
@@ -48,12 +47,15 @@
 //MOTORS
 #define MOTOR_PORT PORTB
 #define MOTOR_PORT_DDR DDRB
-
 #define MOTOR_PIN_0 PINB0
 #define MOTOR_PIN_1 PINB1
 #define MOTOR_PIN_2 PINB2
 #define MOTOR_PIN_3 PINB3
-
+//SOUND
+#define SOUND_PORT PORTD
+#define SOUND_PORT_DDR DDRD
+#define SOUND_PIN PIND6
+#define SOUND_ISR  			TIMER0_COMP_vect
 
 extern void InitAll(void);
 

@@ -15,11 +15,12 @@ volatile static struct
 volatile static struct
 {
 	PPTR Command; 						// ”казатель перехода
-	u16 KeyCode;							// param
+	u08 KeyCode;							// param
 } ProgramKeyCodes[ProgramKeyCodeSize+1];
-
+volatile BOOL isExecutingCommand;
 inline void InitProgramStack(void)
 {
+	isExecutingCommand=0;
 	u08	index;
 	for(index=0;index!=ProgramStackSize+1;index++)	//
 	{
@@ -32,11 +33,23 @@ inline void InitProgramStack(void)
 		ProgramKeyCodes[index].KeyCode= 0;
 	}
 	ProgramKeyCodes[0].Command=ForwardCommand;
-	ProgramKeyCodes[0].KeyCode=0x0002;
-	ProgramKeyCodes[0].Command=BackwardCommand;
-	ProgramKeyCodes[0].KeyCode=0x0200;
+	ProgramKeyCodes[0].KeyCode=2;
+	ProgramKeyCodes[1].Command=BackwardCommand;
+	ProgramKeyCodes[1].KeyCode=8;
+	ProgramKeyCodes[2].Command=RightCommand;
+	ProgramKeyCodes[2].KeyCode=6;
+	ProgramKeyCodes[3].Command=LeftCommand;
+	ProgramKeyCodes[3].KeyCode=4;
 }
-
+PPTR CommandFromCode(u08 key)
+{
+	for(int i=0;i<ProgramKeyCodeSize;i++)
+	{
+		if(ProgramKeyCodes[i].KeyCode==key)
+		return ProgramKeyCodes[i].Command;
+	}
+	return 0x00;
+}
 BOOL AddCommand(PPTR CMD, u08 param)
 {
 	u08		index=0;
@@ -105,29 +118,42 @@ void ForwardCommand(u08 param)
 	MOTOR_PORT_DDR=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
 	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
 	MOTOR_PORT=1<<MOTOR_PIN_0|1<<MOTOR_PIN_2;
-	LED_PORT  |=1<<LED3;
+	isExecutingCommand=1;
 	SetTimerTask(StopMotors,param*100);
 }
 
 void BackwardCommand(u08 param)
 {
-	
+	MOTOR_PORT_DDR=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
+	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
+	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_3;
+	isExecutingCommand=1;
+	SetTimerTask(StopMotors,param*100);
 }
 
 void LeftCommand(u08 param)
 {
-	
+	MOTOR_PORT_DDR=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
+	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
+	MOTOR_PORT=1<<MOTOR_PIN_0|1<<MOTOR_PIN_3;
+	isExecutingCommand=1;
+	SetTimerTask(StopMotors,param*100);
 }
 
 void RightCommand(u08 param)
 {
-	
+	MOTOR_PORT_DDR=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
+	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
+	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2;
+	isExecutingCommand=1;
+	SetTimerTask(StopMotors,param*100);
 }
 
 void StopMotors(void)
 {
-	LED_PORT  &=~(1<<LED3);
+
 	MOTOR_PORT=0<<MOTOR_PIN_0|0<<MOTOR_PIN_1|0<<MOTOR_PIN_2|0<<MOTOR_PIN_3;
 	MOTOR_PORT_DDR=0<<MOTOR_PIN_1|0<<MOTOR_PIN_2|0<<MOTOR_PIN_3|0<<MOTOR_PIN_0;
 	MOTOR_PORT=0<<MOTOR_PIN_1|0<<MOTOR_PIN_2|0<<MOTOR_PIN_3|0<<MOTOR_PIN_0;
+	isExecutingCommand=0;
 }

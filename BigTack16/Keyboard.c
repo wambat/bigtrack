@@ -34,7 +34,7 @@ u16 QueryKeyboard()
 		KEYBOARD_DDR= 1<<currentGround;
 		KEYBOARD_PORT= ~(1<<(currentGround));
 		//wait to set line
-		for(int i=0;i<99;i++)
+		for(int i=0;i<100;i++)
 		;
 				//
 		//now read

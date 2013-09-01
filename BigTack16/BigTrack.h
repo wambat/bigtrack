@@ -10,9 +10,11 @@
 #define BIGTRACK_H_
 
 
-void Task1 (void);
+void TryExecuteNextCommand(void);
 void Task2 (void);
 void QKeyboard (void);
 void onKeyPress(u16);
-
+void toCommandSelectMode(void);
+void toParamMode(void);
+void toExecuteMode(void);
 #endif /* BIGTRACK_H_ */

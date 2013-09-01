@@ -11,5 +11,6 @@
 #include "HAL.h"
 void USART_Transmit( unsigned char data );
 unsigned char USART_Receive( void );
+void USART_send(char *data);
 void initBT(void);
 #endif /* USART_H_ */

@@ -25,4 +25,6 @@ extern void StopMotors();
 extern void InitProgramStack(void);
 extern BOOL AddCommand(PPTR, u08);
 extern BOOL RunNextCommand(void);
+extern PPTR CommandFromCode(u08);
+extern volatile BOOL isExecutingCommand;
 #endif /* PROGRAMMSTACK_H_ */
