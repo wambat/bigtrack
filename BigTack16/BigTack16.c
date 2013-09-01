@@ -84,8 +84,8 @@ void QKeyboard()
 void onKeyPress(u16 key)
 {
 	u08 n=KeyFromCode(key);
-	char str[15];
-	sprintf(str,"[%d]Key pressed: %d\n",mode,n);
+	char str[25];
+	sprintf(str,"[%d]Key pressed: %d(0x%x)\n",mode,n,key);
 	USART_send(str);
 	if(n==15)
 	{
