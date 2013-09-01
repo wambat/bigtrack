@@ -93,6 +93,7 @@ void onKeyPress(u16 key)
 	{
 		playTune(KEY_SOUND,0);
 		USART_send("EXE\n");
+		rewind();
 		toExecuteMode();
 	}
 	if(n==KEY_RESET)
