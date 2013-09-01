@@ -6,6 +6,8 @@
 #include "BigTrack.h"
 #include <stdio.h>
 #include "soundsys/sound.h"
+#include "soundsys/Sounds.h"
+#include "Keyboard.h"
 #define COMMAND_SELECT 0
 #define PARAM_SELECT 1
 #define EXECUTING 2
@@ -87,26 +89,52 @@ void onKeyPress(u16 key)
 	char str[25];
 	sprintf(str,"[%d]Key pressed: %d(0x%x)\n",mode,n,key);
 	USART_send(str);
-	if(n==15)
+	if(n==KEY_RUN)
 	{
+		playTune(KEY_SOUND,0);
 		USART_send("EXE\n");
 		toExecuteMode();
 	}
+	if(n==KEY_RESET)
+	{
+		InitProgramStack();
+		playTune(INIT_SOUND,0);
+		return;
+	}
 	if(mode==COMMAND_SELECT)
 	{
+		playTune(KEY_SOUND,0);
 		USART_send("CMD\n");
 		currentCommand=CommandFromCode(n);
+		currentParam=0;
 		toParamMode();
 		return;
 	}
 	if(mode==PARAM_SELECT && n<10)
 	{
+		
 		USART_send("PRM\n");
-		currentParam=n;
-		AddCommand(currentCommand,currentParam);
-		toCommandSelectMode();
+		if(currentParam>0)
+		{
+			currentParam=currentParam*10+n;
+		}
+		else
+		{
+			playTune(KEY_SOUND,0);
+			currentParam=n;
+		}
 		return;
 	}
+	if(mode==PARAM_SELECT && n==KEY_ENTER)
+	{
+		confirmCommand();
+	}
+}
+void confirmCommand(void)
+{
+	playTune(CONFIRM_SOUND,0);
+	AddCommand(currentCommand,currentParam);
+	toCommandSelectMode();
 }
 void toCommandSelectMode(void)
 {

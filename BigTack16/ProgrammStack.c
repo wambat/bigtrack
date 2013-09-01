@@ -20,10 +20,12 @@ volatile static struct
 	u08 KeyCode;							// param
 } ProgramKeyCodes[ProgramKeyCodeSize+1];
 volatile BOOL isExecutingCommand;
+volatile u08 currentIndex;
 volatile u08 fireCount;
 inline void InitProgramStack(void)
 {
 	isExecutingCommand=0;
+	currentIndex=0;
 	u08	index;
 	for(index=0;index!=ProgramStackSize+1;index++)	//
 	{
@@ -75,7 +77,7 @@ BOOL AddCommand(PPTR CMD, u08 param)
 			ProgramStack[index].Command= CMD;			// Заполняем поле перехода задачи
 			ProgramStack[index].Param= param;		// И поле выдержки времени
 			if (nointerrupted) 	Enable_Interrupt	// Разрешаем прерывания
-			return 1;									// Выход.
+				return 1;									// Выход.
 		}
 		
 	}												// тут можно сделать return c кодом ошибки - нет свободных таймеров
@@ -89,9 +91,21 @@ inline BOOL RunNextCommand(void)
 	u08		param=0;
 
 	Disable_Interrupt				// Запрещаем прерывания!!!
-	CMD = ProgramStack[0].Command;		// Хватаем первое значение из очереди
-	param = ProgramStack[0].Param;
-
+	CMD = ProgramStack[currentIndex].Command;		// Хватаем первое значение из очереди
+	param = ProgramStack[currentIndex].Param;
+	if (CMD==IdleCommand||currentIndex>=ProgramStackSize) 			// Если там пусто
+	{
+		Enable_Interrupt			// Разрешаем прерывания
+		return 0;
+	}
+	else
+	{
+		Enable_Interrupt							// Разрешаем прерывания
+		currentIndex++;
+		(CMD)(param);								// Переходим к задаче
+	}
+	return 1;
+/*
 	if (CMD==IdleCommand) 			// Если там пусто
 	{
 		Enable_Interrupt			// Разрешаем прерывания
@@ -110,7 +124,8 @@ inline BOOL RunNextCommand(void)
 		Enable_Interrupt							// Разрешаем прерывания
 		(CMD)(param);								// Переходим к задаче
 	}
-	return 1;
+	return 1;*/
+	
 }
 
 
@@ -198,4 +213,8 @@ void onSoundPlayed(void)
 {
 	
 	isExecutingCommand=0;	
+}
+void rewind(void)
+{
+	currentIndex=0;
 }

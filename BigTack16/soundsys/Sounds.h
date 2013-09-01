@@ -9,6 +9,9 @@
 #ifndef SOUNDS_H_
 #define SOUNDS_H_
 #define FIRE_SOUND 2
+#define INIT_SOUND 3
+#define KEY_SOUND 4
+#define CONFIRM_SOUND 4
 extern const int ReadyTune[];
 extern const int Imperial[];
 extern const int Tune2[];

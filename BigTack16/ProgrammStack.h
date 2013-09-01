@@ -15,7 +15,7 @@
 typedef void (*PPTR)(u08);
 #define	ProgramStackSize		16
 #define	ProgramKeyCodeSize		16
-extern void  IdleCommand(u08);
+extern void IdleCommand(u08);
 extern void ForwardCommand(u08);
 extern void BackwardCommand(u08);
 extern void LeftCommand(u08);
@@ -28,6 +28,7 @@ extern void StopFire(void);
 
 
 extern void InitProgramStack(void);
+extern void rewind(void);
 extern BOOL AddCommand(PPTR, u08);
 extern BOOL RunNextCommand(void);
 extern PPTR CommandFromCode(u08);

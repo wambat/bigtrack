@@ -12,9 +12,7 @@
 #include "notes.h"
 const int Tune4[] PROGMEM=
 {
-	16,a3, 64,p,
-	16,c3, 64,p,
-	16,f3, 64,p,
+	64,a3,
 0};
 
 
