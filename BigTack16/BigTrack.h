@@ -11,10 +11,14 @@
 
 
 void TryExecuteNextCommand(void);
-void Task2 (void);
-void QKeyboard (void);
+void AliveFlash(void);
+void QKeyboard(void);
 void onKeyPress(u16);
+void onBump();
+void onEncoder();
+
 void toCommandSelectMode(void);
 void toParamMode(void);
 void toExecuteMode(void);
+extern volatile u16 encoderCounter;
 #endif /* BIGTRACK_H_ */

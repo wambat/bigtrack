@@ -13,6 +13,7 @@
 #define EXECUTING 2
 volatile u16 lastkeyTemp;
 volatile u16 lastkey;
+volatile  u16 encoderCounter;
 volatile PPTR currentCommand;
 volatile u08 currentParam;
 volatile u08 lastUsart;
@@ -20,7 +21,17 @@ volatile u08 mode;
 //RTOS Interrupt
 ISR(RTOS_ISR)
 {
-TimerService();
+	TimerService();
+}
+//BUMP 
+//ISR(SENSOR_INTERRUPT_BUMP_VECTOR)
+//{
+//	onBump();
+//}
+//ENCODER
+ISR(SENSOR_INTERRUPT_ENCODER_VECTOR)
+{
+	onEncoder();
 }
 //USART
 ISR(USART_RXC_vect)
@@ -60,9 +71,10 @@ void TryExecuteNextCommand(void)
 	SetTimerTask(TryExecuteNextCommand,10);
 }
 
-void Task2 (void)
+void AliveFlash(void) 
 {
-SetTimerTask(Task2,100);
+	LED_PORT^=1<<SERVICE_LED;
+	SetTimerTask(AliveFlash,100);
 //LED_PORT  &= ~(1<<LED3);
 }
 
@@ -82,6 +94,15 @@ void QKeyboard()
 	lastkeyTemp=lastkey;
 	SetTimerTask(QKeyboard,1);
 }
+void QBump()
+{
+	//grounded resets
+	
+	USART_Transmit(SENSOR_BUMP_PORT_IN);
+	if(~(SENSOR_BUMP_PORT_IN)&(1<<SENSOR_BUMP_PIN))
+		onBump();
+	SetTimerTask(QBump,100);
+}
 
 void onKeyPress(u16 key)
 {
@@ -98,6 +119,7 @@ void onKeyPress(u16 key)
 	}
 	if(n==KEY_RESET)
 	{
+		toCommandSelectMode();
 		InitProgramStack();
 		playTune(INIT_SOUND,0);
 		return;
@@ -115,16 +137,17 @@ void onKeyPress(u16 key)
 	{
 		
 		USART_send("PRM\n");
-		if(currentParam>0)
+		if(currentParam>0&& currentParam<=9)
 		{
 			currentParam=currentParam*10+n;
+			confirmCommand();
 		}
 		else
 		{
 			playTune(KEY_SOUND,0);
 			currentParam=n;
+			return;
 		}
-		return;
 	}
 	if(mode==PARAM_SELECT && n==KEY_ENTER)
 	{
@@ -152,7 +175,17 @@ void toExecuteMode(void)
 	LED_PORT  |=1<<KEYBOARD_LED;
 	mode=EXECUTING;
 }
-
+void onBump(void)
+{
+	//USART_send("BUMP");
+	//playTune(INIT_SOUND,0);
+	//InitProgramStack();
+	//toCommandSelectMode();
+}
+void onEncoder(void)
+{
+	encoderCounter++;
+}
 
 //==============================================================================
 int main(void)
@@ -167,8 +200,10 @@ int main(void)
 	playTune(0,NULL);
 	//initBT();			// init BT
 	// Запуск фоновых задач.
+	SetTask(AliveFlash);
 	SetTask(TryExecuteNextCommand);
 	SetTask(QKeyboard);
+	SetTask(QBump);
 
 	while(1) 		// Главный цикл диспетчера
 	{
