@@ -14,6 +14,7 @@
 volatile u16 lastkeyTemp;
 volatile u16 lastkey;
 volatile  u16 encoderCounter;
+volatile u08 encoderDebouncer;
 volatile PPTR currentCommand;
 volatile u08 currentParam;
 volatile u08 lastUsart;
@@ -31,7 +32,9 @@ ISR(RTOS_ISR)
 //ENCODER
 ISR(SENSOR_INTERRUPT_ENCODER_VECTOR)
 {
-	onEncoder();
+	if(encoderDebouncer>1)
+		onEncoder();
+	encoderDebouncer=0;
 }
 //USART
 ISR(USART_RXC_vect)
@@ -196,6 +199,12 @@ void onEncoder(void)
 {
 	encoderCounter++;
 }
+void incEncoderDebouncer(void)
+{
+	if(encoderDebouncer<0xFF)
+		encoderDebouncer++;
+	SetTimerTask(incEncoderDebouncer,1);
+}
 
 //==============================================================================
 int main(void)
@@ -207,6 +216,7 @@ int main(void)
 	InitProgramStack();
 	InitKeyboard();
 	InitSoundTick();
+	incEncoderDebouncer();
 	playTune(0,NULL);
 	//initBT();			// init BT
 	// Запуск фоновых задач.
