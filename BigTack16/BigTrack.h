@@ -20,5 +20,6 @@ void onEncoder();
 void toCommandSelectMode(void);
 void toParamMode(void);
 void toExecuteMode(void);
+void confirmCommand(void);
 extern volatile u16 encoderCounter;
 #endif /* BIGTRACK_H_ */

@@ -98,10 +98,10 @@ void QBump()
 {
 	//grounded resets
 	
-	USART_Transmit(SENSOR_BUMP_PORT_IN);
+	//USART_Transmit(SENSOR_BUMP_PORT_IN);
 	if(~(SENSOR_BUMP_PORT_IN)&(1<<SENSOR_BUMP_PIN))
 		onBump();
-	SetTimerTask(QBump,100);
+	SetTimerTask(QBump,3);
 }
 
 void onKeyPress(u16 key)
@@ -112,6 +112,10 @@ void onKeyPress(u16 key)
 	USART_send(str);
 	if(n==KEY_RUN)
 	{
+		if(currentCommand&&currentParam>0)
+		{
+			confirmCommand();
+		}
 		playTune(KEY_SOUND,0);
 		USART_send("EXE\n");
 		rewind();
@@ -158,6 +162,8 @@ void confirmCommand(void)
 {
 	playTune(CONFIRM_SOUND,0);
 	AddCommand(currentCommand,currentParam);
+	currentCommand=0;
+	currentParam=0;
 	toCommandSelectMode();
 }
 void toCommandSelectMode(void)
@@ -177,10 +183,14 @@ void toExecuteMode(void)
 }
 void onBump(void)
 {
-	//USART_send("BUMP");
+	USART_send("BUMP");
 	//playTune(INIT_SOUND,0);
 	//InitProgramStack();
-	//toCommandSelectMode();
+	Disable_Interrupt
+	haltAllPeripheral();
+	rewind();
+	toCommandSelectMode();
+	Enable_Interrupt
 }
 void onEncoder(void)
 {

@@ -9,6 +9,8 @@
 #include "soundsys/sound.h"
 #include "soundsys/Sounds.h"
 #include "BigTrack.h"
+#include <stdio.h>
+#include "Usart.h"
 volatile static struct
 {
 	PPTR Command; 						// Указатель перехода
@@ -23,10 +25,12 @@ volatile static struct
 volatile BOOL isExecutingCommand;
 volatile u08 currentIndex;
 volatile u08 fireCount;
+volatile u16 encoderDst;
 inline void InitProgramStack(void)
 {
 	isExecutingCommand=0;
 	currentIndex=0;
+	encoderDst=0;
 	u08	index;
 	for(index=0;index!=ProgramStackSize+1;index++)	//
 	{
@@ -87,7 +91,7 @@ BOOL AddCommand(PPTR CMD, u08 param)
 
 inline BOOL RunNextCommand(void)
 {
-	u08		index=0;
+	//u08		index=0;
 	PPTR	CMD = IdleCommand;		// Инициализируем переменные
 	u08		param=0;
 
@@ -139,49 +143,60 @@ void  IdleCommand(u08 param)
 void ForwardCommand(u08 param)
 {
 	encoderCounter=0;
+	encoderDst=param*ENCODER_MULTIPLIER;
 	MOTOR_PORT_DDR=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
 	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
 	MOTOR_PORT=1<<MOTOR_PIN_0|1<<MOTOR_PIN_2;
 	isExecutingCommand=1;
-	SetTimerTask(StopMotors,param*100);
+	SetTimerTask(CheckIfReachedDestination,10);
 }
 
 void BackwardCommand(u08 param)
 {
 	encoderCounter=0;
+	encoderDst=param*ENCODER_MULTIPLIER;
 	MOTOR_PORT_DDR=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
 	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
 	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_3;
 	isExecutingCommand=1;
-	SetTimerTask(StopMotors,param*100);
+	SetTimerTask(CheckIfReachedDestination,10);
 }
 
 void LeftCommand(u08 param)
 {
 	encoderCounter=0;
+	encoderDst=param*ENCODER_MULTIPLIER;
 	MOTOR_PORT_DDR=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
 	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
 	MOTOR_PORT=1<<MOTOR_PIN_0|1<<MOTOR_PIN_3;
 	isExecutingCommand=1;
-	SetTimerTask(StopMotors,param*100);
+	SetTimerTask(CheckIfReachedDestination,10);
 }
 
 void RightCommand(u08 param)
 {
 	encoderCounter=0;
+	encoderDst=param*ENCODER_MULTIPLIER;
 	MOTOR_PORT_DDR=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
 	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2|1<<MOTOR_PIN_3|1<<MOTOR_PIN_0;
 	MOTOR_PORT=1<<MOTOR_PIN_1|1<<MOTOR_PIN_2;
 	isExecutingCommand=1;
-	SetTimerTask(StopMotors,param*100);
+	SetTimerTask(CheckIfReachedDestination,10);
 }
-
+void CheckIfReachedDestination(void)
+{
+	if(encoderCounter>encoderDst)
+		StopMotors();
+	else
+		SetTimerTask(CheckIfReachedDestination,10);
+}
 void StopMotors(void)
 {
 	char str[25];
 	sprintf(str,"Traveled: %d\n",encoderCounter);
 	USART_send(str);
 	encoderCounter=0;
+	encoderDst=0;
 	MOTOR_PORT=0<<MOTOR_PIN_0|0<<MOTOR_PIN_1|0<<MOTOR_PIN_2|0<<MOTOR_PIN_3;
 	MOTOR_PORT_DDR=0<<MOTOR_PIN_1|0<<MOTOR_PIN_2|0<<MOTOR_PIN_3|0<<MOTOR_PIN_0;
 	MOTOR_PORT=0<<MOTOR_PIN_1|0<<MOTOR_PIN_2|0<<MOTOR_PIN_3|0<<MOTOR_PIN_0;
@@ -211,18 +226,28 @@ void PlayFireSound(void)
 }
 void StopFire(void)
 {
-	LED_PORT&=~(1<<FIRE_LED);
+	OffFireLED();
 	if(fireCount>0)
 		SetTimerTask(playNextFire,20);
 	else
 		isExecutingCommand=0;
 }
+void OffFireLED(void)
+{
+	LED_PORT&=~(1<<FIRE_LED);
+}
 void onSoundPlayed(void)
 {
-	
 	isExecutingCommand=0;	
 }
 void rewind(void)
 {
 	currentIndex=0;
+}
+void haltAllPeripheral(void)
+{
+	fireCount=0;
+	OffFireLED();
+	StopMotors();
+	rewind();
 }
